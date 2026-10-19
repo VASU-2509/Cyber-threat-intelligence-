@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", 6333))
 COLLECTION_NAME = "threat_reports"
@@ -21,7 +23,10 @@ embeddings = GoogleGenerativeAIEmbeddings(
     google_api_key=os.getenv("GEMINI_API_KEY")
 )
 
-client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+if QDRANT_URL:
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+else:
+    client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 def ensure_collection():
     existing = [c.name for c in client.get_collections().collections]
