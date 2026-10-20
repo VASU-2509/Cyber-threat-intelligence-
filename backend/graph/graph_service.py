@@ -65,37 +65,42 @@ def get_attack_graph(report_id: int) -> dict:
         result = session.run("""
             MATCH (n {report_id: $rid})
             OPTIONAL MATCH (n)-[r]->(m {report_id: $rid})
-            RETURN n, r, m
+            RETURN
+                elementId(n) AS source_id,
+                n.name AS source_name,
+                labels(n) AS source_labels,
+                type(r) AS relationship,
+                elementId(m) AS target_id,
+                m.name AS target_name,
+                labels(m) AS target_labels
         """, rid=report_id)
 
         nodes = {}
         links = []
 
         for record in result:
-            n = record["n"]
-            m = record["m"]
-            r = record["r"]
-
-            n_id = str(n.element_id)
-            n_labels = list(n.labels)
-            nodes[n_id] = {
-                "id": n_id,
-                "name": n.get("name", ""),
-                "type": n_labels[0] if n_labels else "Unknown"
+            source_id = record["source_id"]
+            nodes[source_id] = {
+                "id": source_id,
+                "name": record["source_name"] or "",
+                "type": record["source_labels"][0]
+                if record["source_labels"] else "Unknown"
             }
 
-            if m and r:
-                m_id = str(m.element_id)
-                m_labels = list(m.labels)
-                nodes[m_id] = {
-                    "id": m_id,
-                    "name": m.get("name", ""),
-                    "type": m_labels[0] if m_labels else "Unknown"
+            target_id = record["target_id"]
+            relationship = record["relationship"]
+
+            if target_id is not None and relationship is not None:
+                nodes[target_id] = {
+                    "id": target_id,
+                    "name": record["target_name"] or "",
+                    "type": record["target_labels"][0]
+                    if record["target_labels"] else "Unknown"
                 }
                 links.append({
-                    "source": n_id,
-                    "target": m_id,
-                    "type": r.type
+                    "source": source_id,
+                    "target": target_id,
+                    "type": relationship
                 })
 
         return {"nodes": list(nodes.values()), "links": links}
