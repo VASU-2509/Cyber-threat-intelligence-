@@ -37,7 +37,7 @@ export default function GraphPage() {
   const positionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/reports").then((res) => setReports(res.data));
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/reports`).then((res) => setReports(res.data));
   }, []);
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function GraphPage() {
       // Name label
       ctx.fillStyle = "#e2e8f0";
       ctx.font = `${node.type === "ThreatActor" ? 11 : 9}px JetBrains Mono, monospace`;
-      const label = node.name.length > 16 ? node.name.slice(0, 16) + "…" : node.name;
+      const label = node.name.length > 16 ? node.name.slice(0, 16) + "â€¦" : node.name;
       ctx.fillText(label, pos.x, pos.y + 10);
     });
   };
@@ -169,7 +169,7 @@ export default function GraphPage() {
     setLoading(true);
     setGraph(null);
     try {
-      const res = await axios.get(`http://localhost:8000/api/graph/${reportId}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/graph/${reportId}`);
       setGraph(res.data);
     } catch { console.error("Failed to load graph"); }
     setLoading(false);
@@ -260,3 +260,4 @@ export default function GraphPage() {
     </main>
   );
 }
+

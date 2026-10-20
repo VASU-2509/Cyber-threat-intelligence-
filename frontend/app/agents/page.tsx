@@ -94,7 +94,7 @@ const AgentCard = ({
               transition: "all 0.4s",
             }}
           >
-            {status === "complete" ? "✓" : number}
+            {status === "complete" ? "âœ“" : number}
           </div>
           <div>
             <h3 className="mono" style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>
@@ -115,7 +115,7 @@ const AgentCard = ({
             background: bgColor,
           }}
         >
-          {status === "complete" ? "✓ COMPLETE" : status === "running" ? "⚡ RUNNING" : "⏳ PENDING"}
+          {status === "complete" ? "âœ“ COMPLETE" : status === "running" ? "âš¡ RUNNING" : "â³ PENDING"}
         </span>
       </div>
 
@@ -146,7 +146,7 @@ export default function AgentsPage() {
   }>({ research: "pending", risk: "pending", report: "pending" });
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/reports").then((res) => setReports(res.data));
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/reports`).then((res) => setReports(res.data));
   }, []);
 
   const runWorkflow = async () => {
@@ -156,7 +156,7 @@ export default function AgentsPage() {
     setAgentStatuses({ research: "running", risk: "pending", report: "pending" });
 
     try {
-      const res = await axios.post(`http://localhost:8000/api/agents/run/${selectedReport}`);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"}/agents/run/${selectedReport}`);
       setAgentStatuses({ research: "complete", risk: "running", report: "pending" });
       await new Promise((r) => setTimeout(r, 900));
       setAgentStatuses({ research: "complete", risk: "complete", report: "running" });
@@ -225,7 +225,7 @@ export default function AgentsPage() {
           className="btn-green"
           style={{ padding: "10px 24px" }}
         >
-          {loading ? "⚡ AGENTS RUNNING..." : "▶ RUN AGENT WORKFLOW"}
+          {loading ? "âš¡ AGENTS RUNNING..." : "â–¶ RUN AGENT WORKFLOW"}
         </button>
       </div>
 
@@ -234,31 +234,31 @@ export default function AgentsPage() {
         <AgentCard
           number={1}
           name="Research Agent"
-          role="Reads report → Extracts threat actor, CVEs, and IOCs"
+          role="Reads report â†’ Extracts threat actor, CVEs, and IOCs"
           output={result ? `Threat Actor: ${result.threat_actor} | CVEs: ${result.cves.join(", ")}` : undefined}
           status={agentStatuses.research}
         />
         <div style={{ display: "flex", justifyContent: "center", padding: "4px 0" }}>
           <div style={{ width: "1px", height: "20px", background: "var(--border-color)", position: "relative" }}>
-            <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>↓</div>
+            <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>â†“</div>
           </div>
         </div>
         <AgentCard
           number={2}
           name="Risk Agent"
-          role="Receives research output → Calculates risk score and severity"
+          role="Receives research output â†’ Calculates risk score and severity"
           output={result ? `Risk Score: ${result.risk_score}/100 | Severity: ${result.severity}` : undefined}
           status={agentStatuses.risk}
         />
         <div style={{ display: "flex", justifyContent: "center", padding: "4px 0" }}>
           <div style={{ width: "1px", height: "20px", background: "var(--border-color)", position: "relative" }}>
-            <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>↓</div>
+            <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", color: "var(--text-muted)", fontSize: "12px" }}>â†“</div>
           </div>
         </div>
         <AgentCard
           number={3}
           name="Report Agent"
-          role="Receives all data → Generates executive summary and recommendations"
+          role="Receives all data â†’ Generates executive summary and recommendations"
           output={result ? `Generated ${result.recommendations.length} recommendations` : undefined}
           status={agentStatuses.report}
         />
@@ -341,3 +341,4 @@ export default function AgentsPage() {
     </main>
   );
 }
+
